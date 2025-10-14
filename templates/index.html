@@ -29,6 +29,18 @@
     {% if m.category %}
       <div>📁 <em>{{ m.category }}</em></div>
     {% endif %}
+    <form method="POST" action="/buy" style="display:inline-block; margin-right:10px;">
+      <input type="hidden" name="market_id" value="{{ m.id }}">
+      <input type="hidden" name="outcome" value="yes">
+      <input type="number" name="amount" min="1" placeholder="Amount" style="width:70px;">
+      <button type="submit">Buy Yes</button>
+    </form>
+    <form method="POST" action="/buy" style="display:inline-block;">
+      <input type="hidden" name="market_id" value="{{ m.id }}">
+      <input type="hidden" name="outcome" value="no">
+      <input type="number" name="amount" min="1" placeholder="Amount" style="width:70px;">
+      <button type="submit">Buy No</button>
+    </form>
   </div>
   {% else %}
   <p>No markets yet! Add one <a href="{{ url_for('add_market') }}?key=pierogiadmin">here</a>.</p>
