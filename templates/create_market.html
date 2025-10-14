@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Market</title>
+</head>
+<body>
+        <h1>Create a New Market</h1>
+        {% if error %}
+            <div style="color: red; margin-bottom: 10px;">{{ error }}</div>
+        {% endif %}
+        <form method="POST">
+        <label for="question">Market Question:</label><br>
+        <input type="text" id="question" name="question" required><br><br>
+        <label for="category">Category:</label><br>
+        <input type="text" id="category" name="category"><br><br>
+        <label for="yes_price">Initial Yes Price:</label><br>
+        <input type="number" id="yes_price" name="yes_price" min="0" max="100" step="0.01" required><br><br>
+        <label for="no_price">Initial No Price:</label><br>
+        <input type="number" id="no_price" name="no_price" min="0" max="100" step="0.01" required><br><br>
+        <button type="submit">Create Market</button>
+        </form>
+        <br>
+        <a href="/">Back to Home</a>
+</body>
+</html>

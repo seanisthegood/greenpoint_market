@@ -20,30 +20,43 @@
 <body>
   <h1>🟢 Greenpoint Market</h1>
 
-  <p><a href="{{ url_for('add_market') }}?key=pierogiadmin">➕ Add a New Market</a></p>
 
-  {% for m in markets %}
-  <div class="market">
-    <strong>{{ m.question }}</strong><br>
-    <em>Yes:</em> {{ m.yes_price }} | <em>No:</em> {{ m.no_price }}
-    {% if m.category %}
-      <div>📁 <em>{{ m.category }}</em></div>
-    {% endif %}
-    <form method="POST" action="/buy" style="display:inline-block; margin-right:10px;">
-      <input type="hidden" name="market_id" value="{{ m.id }}">
-      <input type="hidden" name="outcome" value="yes">
-      <input type="number" name="amount" min="1" placeholder="Amount" style="width:70px;">
-      <button type="submit">Buy Yes</button>
-    </form>
-    <form method="POST" action="/buy" style="display:inline-block;">
-      <input type="hidden" name="market_id" value="{{ m.id }}">
-      <input type="hidden" name="outcome" value="no">
-      <input type="number" name="amount" min="1" placeholder="Amount" style="width:70px;">
-      <button type="submit">Buy No</button>
-    </form>
-  </div>
+  {% if username %}
+    <p>Welcome, {{ username }}{% if user_points is not none %} — {{ user_points }} 🥟 points{% endif %}
+    (<a href="{{ url_for('logout') }}">Logout</a>)</p>
   {% else %}
-  <p>No markets yet! Add one <a href="{{ url_for('add_market') }}?key=pierogiadmin">here</a>.</p>
-  {% endfor %}
+    <p><a href="{{ url_for('login') }}">Login</a></p>
+  {% endif %}
+
+
+  {% if is_admin %}
+    <p><a href="{{ url_for('create_market') }}">➕ Create a New Market</a></p>
+  {% endif %}
+
+  {% if markets|length == 0 %}
+    <p>No markets yet! {% if is_admin %}Create one <a href="{{ url_for('create_market') }}">here</a>.{% endif %}</p>
+  {% else %}
+    {% for m in markets %}
+    <div class="market">
+      <strong>{{ m.question }}</strong><br>
+      <em>Yes:</em> {{ m.yes_price }} | <em>No:</em> {{ m.no_price }}
+      {% if m.category %}
+        <div>📁 <em>{{ m.category }}</em></div>
+      {% endif %}
+      <form method="POST" action="/buy" style="display:inline-block; margin-right:10px;">
+        <input type="hidden" name="market_id" value="{{ m.id }}">
+        <input type="hidden" name="outcome" value="yes">
+        <input type="number" name="amount" min="1" placeholder="Amount" style="width:70px;">
+        <button type="submit">Buy Yes</button>
+      </form>
+      <form method="POST" action="/buy" style="display:inline-block;">
+        <input type="hidden" name="market_id" value="{{ m.id }}">
+        <input type="hidden" name="outcome" value="no">
+        <input type="number" name="amount" min="1" placeholder="Amount" style="width:70px;">
+        <button type="submit">Buy No</button>
+      </form>
+    </div>
+    {% endfor %}
+  {% endif %}
 </body>
 </html>
