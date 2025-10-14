@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add a Market</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      padding: 30px;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>Add a New Market</h1>
+
+  <form method="POST">
+    <label>Question:</label>
+    <input type="text" name="question" required>
+
+    <label>Category:</label>
+    <select name="category">
+      <option value="Weather">Weather</option>
+      <option value="Transit">Transit</option>
+      <option value="Local Life">Local Life</option>
+      <option value="Misc">Misc</option>
+    </select>
+
+    <button type="submit">Add Market</button>
+  </form>
+
+  <p><a href="{{ url_for('home') }}">← Back to markets</a></p>
+</body>
+</html>

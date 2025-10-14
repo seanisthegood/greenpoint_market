@@ -1,34 +1,70 @@
-from flask import Flask, jsonify, request
+from flask import Flask, render_template, jsonify
+from flask import request, redirect, url_for, abort
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 app = Flask(__name__)
 
-# temporary in-memory markets
-markets = [
-    {"id": 1, "question": "Will the G train run on time this weekend?", "yes": 50.0, "no": 50.0},
-    {"id": 2, "question": "Will it rain at McCarren Park on Sunday?", "yes": 50.0, "no": 50.0},
-]
+# --- Database config ---
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///market.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
-@app.route("/api/markets")
-def get_markets():
-    return jsonify(markets)
+# --- Models ---
+class Market(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    question = db.Column(db.String(200), nullable=False)
+    yes_price = db.Column(db.Float, default=50)
+    no_price = db.Column(db.Float, default=50)
+    category = db.Column(db.String(100))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-@app.route("/api/trade", methods=["POST"])
-def trade():
-    data = request.get_json()
-    m = next((m for m in markets if m["id"] == data["market_id"]), None)
-    if not m:
-        return jsonify({"error": "Market not found"}), 404
+    def __repr__(self):
+        return f"<Market {self.question}>"
 
-    side = data.get("side")
-    amount = float(data.get("amount", 0))
-    if side not in ("yes", "no"):
-        return jsonify({"error": "side must be 'yes' or 'no'"}), 400
+# --- Create database if not exists ---
+with app.app_context():
+    db.create_all()
 
-    m[side] += amount
-    total = m["yes"] + m["no"]
-    m["yes_price"] = round(m["yes"] / total, 2)
-    m["no_price"] = round(m["no"] / total, 2)
-    return jsonify(m)
+# --- Routes ---
+@app.route('/')
+def home():
+    markets = Market.query.all()
+    return render_template('index.html', markets=markets)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+@app.route('/api/markets')
+def api_markets():
+    markets = Market.query.all()
+    return jsonify([
+        {
+            "id": m.id,
+            "question": m.question,
+            "yes": m.yes_price,
+            "no": m.no_price,
+            "category": m.category,
+        }])
+
+@app.route('/add', methods=['GET', 'POST'])
+def add_market():
+    SECRET_KEY = "pierogiadmin"  # change this later!
+    key = request.args.get("key")
+    if key != SECRET_KEY:
+        abort(403)  # show a 403 Forbidden page if wrong key
+    if request.method == 'POST':
+        question = request.form['question']
+        category = request.form['category']
+        new_market = Market(question=question, category=category)
+        db.session.add(new_market)
+        db.session.commit()
+        return redirect(url_for('home'))
+    return render_template('add_market.html')
+
+@app.route('/delete/<int:id>')
+def delete_market(id):
+    SECRET_KEY = "pierogiadmin"
+    if request.args.get("key") != SECRET_KEY:
+        abort(403)
+    market = Market.query.get_or_404(id)
+    db.session.delete(market)
+    db.session.commit()
+    return redirect(url_for('home'))

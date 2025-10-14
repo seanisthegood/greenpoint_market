@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Greenpoint Market</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 20px; }
+    h1 { color: #2c3e50; }
+    a { text-decoration: none; color: #007bff; }
+    .market {
+      background: white;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .market strong { font-size: 1.1em; }
+  </style>
+</head>
+<body>
+  <h1>🟢 Greenpoint Market</h1>
+
+  <p><a href="{{ url_for('add_market') }}?key=pierogiadmin">➕ Add a New Market</a></p>
+
+  {% for m in markets %}
+  <div class="market">
+    <strong>{{ m.question }}</strong><br>
+    <em>Yes:</em> {{ m.yes_price }} | <em>No:</em> {{ m.no_price }}
+    {% if m.category %}
+      <div>📁 <em>{{ m.category }}</em></div>
+    {% endif %}
+  </div>
+  {% else %}
+  <p>No markets yet! Add one <a href="{{ url_for('add_market') }}?key=pierogiadmin">here</a>.</p>
+  {% endfor %}
+</body>
+</html>
